@@ -3,60 +3,32 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.io.*;
+import java.net.*;
 public class Main {
+    private static int PORT = 23456;
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        List<String> files = new ArrayList<>();
-        List<String> validNamesList = new ArrayList<>(Arrays.asList("file1","file2","file3","file4","file5","file6","file7","file8","file9","file10"));
-        String  input = scanner.nextLine();
-        while (!input.equals("exit")){
-            String[] commands = input.split(" ");
-            switch (commands[0]) {
-                case "add":
-                addfile(commands[1], files,validNamesList);
-                break;
+        System.out.println("Server started!");
+        try(ServerSocket server =new ServerSocket(PORT)){
+              try(Socket socket = server.accept();
+                  DataInputStream input = new DataInputStream(socket.getInputStream());
+                   DataOutputStream output = new DataOutputStream(socket.getOutputStream())){
 
-                case "get":
-                    getFile(commands[1], files);
-                    break;
+                  String msg = input.readUTF();
+                  System.out.println("Received: " + msg);
+                  output.writeUTF("All files were sent!");
+                  System.out.println("Sent: All files were sent!");
 
-                case "delete":
-                    deleteFile(commands[1], files);
-                    break;
-            }
-          input = scanner.nextLine();
+              }
+              catch (Exception e){
+                  System.out.println("something went wrong with server");
+              }
         }
-    }
-
-
-
-    public static void addfile(String fileName, List<String> files,List<String> validNamesList){
-        if(!files.contains(fileName) && validNamesList.contains(fileName)) {
-            files.add(fileName);
-            System.out.println("The file " + fileName + " added successfully");
+        catch (Exception e){
+            System.out.println("something went wrong with server");
         }
-        else {
-            System.out.println("Cannot add the file " +fileName);
+
         }
-    }
-
-    public static void deleteFile(String fileName, List<String> files){
-       if(files.contains(fileName)){
-           files.remove(fileName);
-           System.out.println("The file " + fileName + " was deleted");
-       }
-       else {
-           System.out.println("The file " + fileName +" not found");
-       }
-    }
-
-    public static void getFile(String fileName, List<String> files){
-      if(files.contains(fileName)){
-          System.out.println("The file " + fileName + " was sent");
-      }
-      else {
-          System.out.println("The file " + fileName +" not found");
-      }
-    }
 }
+
 
